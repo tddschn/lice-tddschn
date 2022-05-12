@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "lice-tddschn"
+version = "0.1.0"
+description = "Generate a license file for a project"
+authors = ["Xinyuan Chen <45612704+tddschn@users.noreply.github.com>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/tddschn/lice-tddschn"
+repository = "https://github.com/tddschn/lice-tddschn"
+classifiers = [
+	"Topic :: Utilities",
+	'Development Status :: 4 - Beta',
+	'Intended Audience :: Developers',
+	'Operating System :: OS Independent',
+]
+keywords = ["lice", "license", "generator"]
+
+[tool.poetry.scripts]
+lice = "lice.core:main"
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/tddschn/lice-tddschn/issues"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.dev-dependencies]
+toml = "^0.10.2"
+yapf = "^0.32.0"
+better-exceptions = "^0.3.3"
+bump2version = "^1.0.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

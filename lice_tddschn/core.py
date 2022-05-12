@@ -1,4 +1,5 @@
-from pkg_resources import (resource_stream, resource_listdir)
+from pathlib import Path
+# from pkg_resources import (resource_stream, resource_listdir)
 from io import StringIO
 import argparse
 import datetime
@@ -8,15 +9,17 @@ import subprocess
 import sys
 import getpass
 
+PARENT_DIR = Path(__file__).parent
 
-LICENSES = []
-for file in sorted(resource_listdir(__name__, '.')):
-    match = re.match(r'template-([a-z0-9_]+).txt', file)
-    if match:
-        LICENSES.append(match.groups()[0])
+# LICENSES = []
+# for file in sorted(resource_listdir(__name__, '.')):
+#     match = re.match(r'template-([a-z0-9_]+).txt', file)
+#     if match:
+#         LICENSES.append(match.groups()[0])
+LICENSES = [p.name for p in PARENT_DIR.glob('template-*.txt')]
 
-DEFAULT_LICENSE = "bsd3"
-
+# DEFAULT_LICENSE = "bsd3"
+DEFAULT_LICENSE = "mit"
 
 # To extend language formatting sopport with a new language, add an item in
 # LANGS dict:
@@ -39,7 +42,6 @@ DEFAULT_LICENSE = "bsd3"
 # LANGS = {"cpp":"c"}
 # (for more examples see LANG_CMT and langs dicts below)
 # NOTE: unicode (u) in comment strings is required.
-
 
 LANGS = {
     "agda": "haskell",
@@ -90,7 +92,8 @@ LANG_CMT = {
     "ruby": [u'=begin', u'', u'=end'],
     "text": [u'', u'', u''],
     "unix": [u'', u'#', u''],
-    "rust": [u'', u'//' u''],
+    "rust": [u'', u'//'
+             u''],
 }
 
 
@@ -144,9 +147,10 @@ def load_package_template(license, header=False):
     """
     content = StringIO()
     filename = 'template-%s-header.txt' if header else 'template-%s.txt'
-    with resource_stream(__name__, filename % license) as licfile:
-        for line in licfile:
-            content.write(line.decode("utf-8"))  # write utf-8 string
+    # with resource_stream(__name__, filename % license) as licfile:
+    #     for line in licfile:
+    #         content.write(line.decode("utf-8"))  # write utf-8 string
+    content.write(load_file_template(PARENT_DIR / filename % license).read())
     return content
 
 
@@ -215,41 +219,64 @@ def main():
 
     parser = argparse.ArgumentParser(description='Generate a license')
 
+    parser.add_argument('license',
+                        metavar='license',
+                        nargs="?",
+                        choices=LICENSES,
+                        help='the license to generate, one of: %s' %
+                        ", ".join(LICENSES))
     parser.add_argument(
-        'license', metavar='license', nargs="?", choices=LICENSES,
-        help='the license to generate, one of: %s' % ", ".join(LICENSES))
-    parser.add_argument(
-        '--header', dest='header', action="store_true",
+        '--header',
+        dest='header',
+        action="store_true",
         help='generate source file header for specified license')
     parser.add_argument(
-        '-o', '--org', dest='organization', default=guess_organization(),
+        '-o',
+        '--org',
+        dest='organization',
+        default=guess_organization(),
         help='organization, defaults to .gitconfig or os.environ["USER"]')
     parser.add_argument(
-        '-p', '--proj', dest='project', default=os.getcwd().split(os.sep)[-1],
+        '-p',
+        '--proj',
+        dest='project',
+        default=os.getcwd().split(os.sep)[-1],
         help='name of project, defaults to name of current directory')
+    parser.add_argument('-t',
+                        '--template',
+                        dest='template_path',
+                        help='path to license template file')
+    parser.add_argument('-y',
+                        '--year',
+                        dest='year',
+                        type=valid_year,
+                        default="%i" % datetime.date.today().year,
+                        help='copyright year')
     parser.add_argument(
-        '-t', '--template', dest='template_path',
-        help='path to license template file')
-    parser.add_argument(
-        '-y', '--year', dest='year', type=valid_year,
-        default="%i" % datetime.date.today().year, help='copyright year')
-    parser.add_argument(
-        '-l', '--language', dest='language',
+        '-l',
+        '--language',
+        dest='language',
         help='format output for language source file, one of: %s [default is '
         'not formatted (txt)]' % ', '.join(LANGS.keys()))
+    parser.add_argument('-f',
+                        '--file',
+                        dest='ofile',
+                        default='stdout',
+                        help='Name of the output source file (with -l, '
+                        'extension can be ommitted)')
+    parser.add_argument('--vars',
+                        dest='list_vars',
+                        action="store_true",
+                        help='list template variables for specified license')
     parser.add_argument(
-        '-f', '--file', dest='ofile', default='stdout',
-        help='Name of the output source file (with -l, '
-        'extension can be ommitted)')
-    parser.add_argument(
-        '--vars', dest='list_vars', action="store_true",
-        help='list template variables for specified license')
-    parser.add_argument(
-        '--licenses', dest='list_licenses', action="store_true",
+        '--licenses',
+        dest='list_licenses',
+        action="store_true",
         help='list available license templates and their parameters')
-    parser.add_argument(
-        '--languages', dest='list_languages', action="store_true",
-        help='list available source code formatting languages')
+    parser.add_argument('--languages',
+                        dest='list_languages',
+                        action="store_true",
+                        help='list available source code formatting languages')
 
     args = parser.parse_args()
 
@@ -364,6 +391,7 @@ def main():
         out.seek(0)
         sys.stdout.write(out.getvalue())
     out.close()  # free content memory (paranoic memory stuff)
+
 
 if __name__ == "__main__":
     main()

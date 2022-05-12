@@ -1,12 +1,12 @@
 import os
 from io import StringIO
 
-import lice
-from lice.core import (
+import lice_tddschn
+from lice_tddschn.core import (
     LICENSES, clean_path, extract_vars, generate_license,
     load_file_template, load_package_template)
 
-TEMPLATE_PATH = os.path.dirname(lice.__file__)
+TEMPLATE_PATH = os.path.dirname(lice_tddschn.__file__)
 
 
 def test_paths():

@@ -1,4 +1,4 @@
-from lice import __version__
+from lice_tddschn import __version__
 from setuptools import setup, find_packages
 import sys
 
