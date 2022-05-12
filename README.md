@@ -1,8 +1,8 @@
 # lice-tddschn
 
-Fork of [Lice](https://github.com/licenses/lice).
+Fork of [Lice](https://github.com/licenses/lice), [original license](LICENSE-orig).
 
-lice-tddschn is a lot faster, and it doesn't depend on the `pkg_resources` module from `setuptools`.
+lice-tddschn is made faster by not importing `pkg_resources` included in `setuptools`.
 
 Lice generates license files. No more hunting down licenses from other
 projects.
