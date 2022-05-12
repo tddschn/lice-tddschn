@@ -11,12 +11,13 @@ import getpass
 
 PARENT_DIR = Path(__file__).parent
 
-# LICENSES = []
+LICENSES = []
 # for file in sorted(resource_listdir(__name__, '.')):
-#     match = re.match(r'template-([a-z0-9_]+).txt', file)
-#     if match:
-#         LICENSES.append(match.groups()[0])
-LICENSES = [p.name for p in PARENT_DIR.glob('template-*.txt')]
+for file in sorted(PARENT_DIR.glob('template-*.txt')):
+    match = re.match(r'template-([a-z0-9_]+).txt', file.name)
+    if match:
+        LICENSES.append(match.groups()[0])
+# LICENSES = [p.name for p in PARENT_DIR.glob('template-*.txt')]
 
 # DEFAULT_LICENSE = "bsd3"
 DEFAULT_LICENSE = "mit"
@@ -150,7 +151,8 @@ def load_package_template(license, header=False):
     # with resource_stream(__name__, filename % license) as licfile:
     #     for line in licfile:
     #         content.write(line.decode("utf-8"))  # write utf-8 string
-    content.write(load_file_template(PARENT_DIR / filename % license).read())
+    # content.write(load_file_template(PARENT_DIR / (filename % license)).read())
+    content.write((PARENT_DIR / (filename % license)).read_text())
     return content
 
 
